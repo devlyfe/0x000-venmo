@@ -28,7 +28,10 @@ class Venmo
             RequestOptions::HTTP_ERRORS => false,
             RequestOptions::VERIFY => false,
             RequestOptions::COOKIES   => $this->cookieJar,
-            RequestOptions::PROXY => 'http://' . $proxyAuth . '@' . $proxyServer
+            // RequestOptions::PROXY => 'http://' . $proxyAuth . '@' . $proxyServer,
+            RequestOptions::HEADERS => [
+                'User-Agent'    =>  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+            ]
         ]);
     }
 
@@ -49,8 +52,7 @@ class Venmo
             ],
             'headers'   => [
                 'Content-Type'  =>  'application/x-www-form-urlencoded',
-                'Accept'        =>  'application/json',
-                'User-Agent'    =>  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+                'Accept'        =>  'application/json'
             ]
         ]);
 
@@ -69,6 +71,20 @@ class Venmo
                 81109   => VenmoStatus::LIVE,
                 default => VenmoStatus::UNKNOWN
             };
+
+            /**
+             * @todo
+             */
+            // if ($status === VenmoStatus::LIVE) {
+            //     $otpSecret = $loginRequest->getHeader('venmo-otp-secret');
+            //     $otpPageRequest = $this->client->get('https://account.venmo.com/account/mfa/code-prompt?' . http_build_query([
+            //         'k' => $otpSecret,
+            //         'next'  => '/'
+            //     ]));
+
+            //     $otpPageResponse = $otpPageRequest->getBody()->getContents();
+            //     preg_match('/id="__NEXT_DATA__" type="application\/json">(.*)<\/script>/', $otpPageResponse, $otpJsonResponseString);
+            // }
 
             return $this->response($status, $loginResponse->error->code . ': ' .  $loginResponse->error->message, $loginRequest);
         }

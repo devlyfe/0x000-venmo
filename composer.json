@@ -1,18 +1,13 @@
 {
-    "name": "laravel-zero/laravel-zero",
-    "description": "The Laravel Zero Framework.",
-    "keywords": ["framework", "laravel", "laravel zero", "console", "cli"],
-    "homepage": "https://laravel-zero.com",
+    "name": "0x000/venmo",
+    "description": "Blazing fast venmo cli account checker.",
+    "keywords": [],
     "type": "project",
     "license": "MIT",
-    "support": {
-        "issues": "https://github.com/laravel-zero/laravel-zero/issues",
-        "source": "https://github.com/laravel-zero/laravel-zero"
-    },
     "authors": [
         {
-            "name": "Nuno Maduro",
-            "email": "enunomaduro@gmail.com"
+            "name": "0x000",
+            "email": "me@0x000.id"
         }
     ],
     "require": {
@@ -50,5 +45,7 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "bin": ["venmo"]
+    "bin": [
+        "venmo"
+    ]
 }
