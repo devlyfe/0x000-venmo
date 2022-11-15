@@ -24,6 +24,7 @@ class Venmo
 
         $this->cookieJar = new CookieJar();
         $this->client = new Client([
+            RequestOptions::TIMEOUT => 60,
             RequestOptions::HTTP_ERRORS => false,
             RequestOptions::VERIFY => false,
             RequestOptions::COOKIES   => $this->cookieJar,
@@ -43,8 +44,8 @@ class Venmo
         $loginRequest = $this->client->post('https://venmo.com/login', [
             'form_params'   => [
                 'return_json' => true,
-                'password' => $this->email,
-                'phoneEmailUsername' => $this->password,
+                'password' => $this->password,
+                'phoneEmailUsername' => $this->email,
             ],
             'headers'   => [
                 'Content-Type'  =>  'application/x-www-form-urlencoded',
@@ -53,21 +54,23 @@ class Venmo
             ]
         ]);
 
-        $loginResponse = json_decode($loginRequest->getBody()->getContents());
+        $loginResponse  = $loginRequest->getBody()->getContents();
+        $loginResponse = json_decode($loginResponse);
 
         if (!$loginResponse) {
-            return $this->response(VenmoStatus::ERROR, 'Cannot parse the response');
+            return $this->response(VenmoStatus::UNKNOWN, 'Cannot parse the response', $loginRequest);
         }
 
         $loginResponse = optional($loginResponse);
 
         if ($loginResponse->error) {
-            $status = match ($loginResponse->error->code) {
+            $status = match ((int) $loginResponse->error->code) {
                 264     => VenmoStatus::DIE,
-                default => VenmoStatus::ERROR
+                81109   => VenmoStatus::LIVE,
+                default => VenmoStatus::UNKNOWN
             };
 
-            return $this->response($status, $loginResponse->error->message);
+            return $this->response($status, $loginResponse->error->code . ': ' .  $loginResponse->error->message, $loginRequest);
         }
 
         return $this->response(VenmoStatus::UNKNOWN, 'Unknown error', $loginResponse);
@@ -80,7 +83,7 @@ class Venmo
         }
 
         return (object) [
-            'status'    => $status->value,
+            'status'    => $status,
             'message'   => $message,
             'data'      => [
                 'email' => $this->email,

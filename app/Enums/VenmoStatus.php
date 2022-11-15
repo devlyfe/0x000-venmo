@@ -6,6 +6,6 @@ enum VenmoStatus: string
 {
     case DIE = 'DIE';
     case LIVE = 'Live';
-    case ERROR = 'Error';
-    case UNKNOWN = 'Unknown';
+    case ERROR = 'ERROR';
+    case UNKNOWN = 'UNKNOWN';
 }

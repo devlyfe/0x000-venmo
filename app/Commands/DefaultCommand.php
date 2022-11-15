@@ -33,6 +33,7 @@ class DefaultCommand extends Command
     public function handle()
     {
         $listFile = 'list.txt';
+        $speed = $this->ask('input speed', 10);
 
         if (!file_exists($listFile)) {
             return render(<<<KONTOL
@@ -91,6 +92,8 @@ class DefaultCommand extends Command
             });
 
         // forking the jobs
-        Fork::new()->run(...$lists->toArray());
+        Fork::new()
+            ->concurrent($speed)
+            ->run(...$lists->toArray());
     }
 }
