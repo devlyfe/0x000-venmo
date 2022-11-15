@@ -28,7 +28,7 @@ class Venmo
             RequestOptions::HTTP_ERRORS => false,
             RequestOptions::VERIFY => false,
             RequestOptions::COOKIES   => $this->cookieJar,
-            // RequestOptions::PROXY => 'http://' . $proxyAuth . '@' . $proxyServer,
+            RequestOptions::PROXY => 'http://' . $proxyAuth . '@' . $proxyServer,
             RequestOptions::HEADERS => [
                 'User-Agent'    =>  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
             ]
@@ -110,22 +110,29 @@ class Venmo
 
     public function writeUnknownResponse(VenmoStatus $status, ResponseInterface $response)
     {
-        if ($status === VenmoStatus::UNKNOWN) {
-            $unknownResponsePath = getcwd() . '/result/unknown/http_' . $response->getStatusCode();
+        try {
+            if ($status === VenmoStatus::UNKNOWN) {
+                $unknownResponsePath = getcwd() . '/result/unknown/http_' . $response->getStatusCode();
 
-            if (!is_dir($unknownResponsePath)) {
-                @mkdir($unknownResponsePath, 0777, true);
-            }
+                if (!is_dir($unknownResponsePath)) {
+                    @mkdir($unknownResponsePath, 0777, true);
+                }
 
-            $htmlResponse = (string) $response->getBody()->getContents();
-            $responseJson = optional(json_encode($response));
+                $htmlResponse = (string) $response->getBody()->getContents();
+                $responseJson = json_encode([
+                    $this->email,
+                    $this->password,
+                ]);
 
-            @file_put_contents($unknownResponsePath . '/' . str($this->email)->slug('_') . '.html', <<<KONTOL
+                @file_put_contents($unknownResponsePath . '/' . str($this->email)->slug('_') . '.html', <<<KONTOL
                 <div>
                     $responseJson
                 </div>
                 $htmlResponse
             KONTOL);
+            }
+        } catch (\Throwable $_) {
+            // do nothing bro
         }
     }
 }
